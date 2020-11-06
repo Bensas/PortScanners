@@ -3,6 +3,7 @@ import (
     "context"
     "fmt"
     "net"
+    "os"
     "os/exec"
     "strconv"
     "strings"
@@ -10,6 +11,9 @@ import (
     "time"
     "golang.org/x/sync/semaphore"
 )
+
+const DEFAULT_START_PORT = 0
+const DEFAULT_END_PORT = 65535
 
 type PortScanner struct {
     ip   string
@@ -64,9 +68,26 @@ func (ps *PortScanner) Start(f, l int, timeout time.Duration) {
 }
 
 func main() {
+	ip := os.Args[1]
+	startPort, err1 := strconv.Atoi(os.Args[2])
+	endPort, err2 := strconv.Atoi(os.Args[3])
+
+	// if (ip == nil) {
+	// 	fmt.Println("Please specify a target IP.\nUsage: scan_ports [ip_add] [start_port] [end_port]")
+	// 	os.Exit(1)
+	// }
+
+	if (err1 != nil) {
+		startPort = DEFAULT_START_PORT
+	}
+
+	if (err2 != nil) {
+		endPort = DEFAULT_END_PORT
+	}
+
     ps := &PortScanner{
-        ip:   "127.0.0.1",
+        ip:   ip,
         lock: semaphore.NewWeighted(Ulimit()),
     }
-    ps.Start(1, 65535, 500*time.Millisecond)
+    ps.Start(startPort, endPort, 500*time.Millisecond)
 }
