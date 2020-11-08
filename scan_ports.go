@@ -68,26 +68,34 @@ func (ps *PortScanner) Start(f, l int, timeout time.Duration) {
 }
 
 func main() {
+    if (len(os.Args) < 2) {
+        fmt.Println("Please specify a target IP.\nUsage: scan_ports [ip_add] [start_port] [end_port]")
+        os.Exit(1)
+    }
 	ip := os.Args[1]
-	startPort, err1 := strconv.Atoi(os.Args[2])
-	endPort, err2 := strconv.Atoi(os.Args[3])
 
-	// if (ip == nil) {
-	// 	fmt.Println("Please specify a target IP.\nUsage: scan_ports [ip_add] [start_port] [end_port]")
-	// 	os.Exit(1)
-	// }
+    var startPort, endPort int
 
-	if (err1 != nil) {
-		startPort = DEFAULT_START_PORT
-	}
+    if (len(os.Args) < 4) {
+        fmt.Sprintf("No start or end port specified, scanning from %d to %s", DEFAULT_START_PORT, DEFAULT_END_PORT)
+        startPort = DEFAULT_START_PORT
+        endPort = DEFAULT_END_PORT
+    } else {
 
-	if (err2 != nil) {
-		endPort = DEFAULT_END_PORT
-	}
+        startNum, err1 := strconv.Atoi(os.Args[2])
+        endNum, err2 := strconv.Atoi(os.Args[3])
+
+        if (err1 != nil || err2 != nil) {
+            fmt.Println("Invalid format on start or end port.")
+            os.Exit(1)
+        }
+        startPort = startNum
+        endPort = endNum
+    }
 
     ps := &PortScanner{
         ip:   ip,
         lock: semaphore.NewWeighted(Ulimit()),
     }
-    ps.Start(startPort, endPort, 500*time.Millisecond)
+    ps.Start(startPort, endPort, 1000*time.Millisecond)
 }
