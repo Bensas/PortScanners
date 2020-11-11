@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
@@ -30,12 +31,29 @@ void testStrIsPositiveNumber() {
 	assert(strIsPositiveNumber(nonNumber) == false);
 }
 
+struct in_addr resolveHostnameToAddr(char* hostname) {
+
+    struct addrinfo* info;
+
+    int err1 = getaddrinfo(hostname, NULL, NULL, &info);
+
+    if (err1 != 0) {
+        printf("Failed to resolve provided hostname. Exiting.\n");
+        exit(1);
+    }
+
+    return (struct in_addr)((struct sockaddr_in *)info->ai_addr)->sin_addr;
+
+    // struct sockaddr_in* addr = (struct sockaddr_in *)result->ai_addr; 
+    // printf("%s\n", inet_ntoa((struct in_addr)addr->sin_addr));
+}
+
 void scanPorts(char* hostname, int startPort, int endPort) {
 	struct sockaddr_in* sockAddr;
 	int sock;
 	sockAddr = malloc(sizeof(struct sockaddr_in));
 	sockAddr->sin_family = AF_INET;
-	sockAddr->sin_addr.s_addr = inet_addr(hostname);
+	sockAddr->sin_addr = resolveHostnameToAddr(hostname);
 
 	printf("Scanning...\n");
 
@@ -54,6 +72,8 @@ void scanPorts(char* hostname, int startPort, int endPort) {
 		
 		if( err >= 0 ) {
 			printf("%-5d open\n",  port);
+		} else {
+			printf("%-5d closed\n",  port);
 		}
 
 		close(sock);
