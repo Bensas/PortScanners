@@ -1,5 +1,5 @@
 # PortScanners
-Simple port scaning programs written in a variety of languages for no particular purpose :)
+Simple port scaning programs written in a variety of languages just for fun :)
 
 ## Compilation / Running
 ### C
