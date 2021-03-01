@@ -1,6 +1,8 @@
 # PortScanners
 Simple port scaning programs written in a variety of languages just for fun :)
 
+These are BY NO MEANS optimal.
+
 ## Compilation / Running
 ### C
 1) ```cd C```
